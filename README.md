@@ -1,6 +1,6 @@
 <img src="https://ws3.sinaimg.cn/large/ecabade5ly1fqwuz2k658j20le05nt8i" alt="Typecho-WeiboFile新浪微博图片上传插件" />
 
-### Typecho-WeiboFileNotMovie新浪微博图片上传插件无视频版
+### Typecho-WeiboFileNotMovie新浪微博图片上传插件纯净无视频版
 ---
 
 （微博图床无视频版）将 Typecho 的附件上传至新浪微博云存储中，无需申请appid，不占用服务器大小，可永久保存，只需一个不会登录的微博小号即可。
@@ -15,8 +15,8 @@
 第三步：填写微博小号等等配置；<br />
 第四步：完成。
 
-#### 使用注意：
-此插件版本使用php5.6编写，php7.0“可能”会报语法错误，建议使用php5.6，因为7.0实在太高了=_=!
+#### 版本推荐：
+php5.6+mysql5.0.11+Typecho正式版，其他版本也可能支持，若不支持联系作者。
 
 #### 与我联系：
 作者：二呆<br />
@@ -28,4 +28,10 @@ Github：https://github.com/muzishanshi/WeiboFileNotMovie
 七牛：https://www.qiniu.com/
 
 #### 更新记录：
-2018-08-30 因视频功能尚未完善，故此版本去掉了视频上传功能，仅保留微博图床功能。
+2018-11-30  1.0.7
+	
+	支持其他格式文件上传
+	
+2018-08-30
+
+	因视频功能尚未完善，故此版本去掉了视频上传功能，仅保留微博图床功能。
