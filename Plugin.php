@@ -28,7 +28,7 @@ class WeiboFileNotMovie_Plugin implements Typecho_Plugin_Interface{
     // 插件配置面板
     public static function config(Typecho_Widget_Helper_Form $form){
 		//版本检查
-		$version=file_get_contents('http://api.tongleer.com/interface/WeiboFile.php?action=updateWeiboFileNotMovie&version=6');
+		$version=file_get_contents('https://tongleer.com/api/interface/WeiboFile.php?action=updateWeiboFileNotMovie&version=6');
 		$headDiv=new Typecho_Widget_Helper_Layout();
 		$headDiv->html('版本检查：'.$version);
 		$headDiv->render();
