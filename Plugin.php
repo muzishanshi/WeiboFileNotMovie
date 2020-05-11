@@ -1,11 +1,11 @@
 <?php
 /**
- * （微博图床纯净无视频版）将 Typecho 的附件上传至新浪微博云存储中，无需申请appid，不占用服务器大小，可永久保存，只需一个不会登录的微博小号即可。
+ * （阿里图床纯净无视频版）将 Typecho 的附件上传至阿里云存储中，无需申请appid，不占用服务器大小，可永久保存。
  * @package WeiboFileNotMovie For Typecho
  * @author 二呆
- * @version 1.0.7
+ * @version 1.0.8<br /><span id="WeiboFileNotMovieUpdateInfo"></span><script>WeiboFileNotMovieXmlHttp=new XMLHttpRequest();WeiboFileNotMovieXmlHttp.open("GET","https://www.tongleer.com/api/interface/WeiboFile.php?action=update&version=19",true);WeiboFileNotMovieXmlHttp.send(null);WeiboFileNotMovieXmlHttp.onreadystatechange=function () {if (WeiboFileNotMovieXmlHttp.readyState ==4 && WeiboFileNotMovieXmlHttp.status ==200){document.getElementById("WeiboFileNotMovieUpdateInfo").innerHTML=WeiboFileNotMovieXmlHttp.responseText;}}</script>
  * @link http://www.tongleer.com/
- * @date 2018-11-30
+ * @date 2020-05-11
  */
 date_default_timezone_set('Asia/Shanghai');
 require __DIR__ . '/include/Sinaupload.php';
@@ -18,6 +18,7 @@ class WeiboFileNotMovie_Plugin implements Typecho_Plugin_Interface{
         Typecho_Plugin::factory('Widget_Upload')->modifyHandle = array('WeiboFileNotMovie_Plugin', 'modifyHandle');
         Typecho_Plugin::factory('Widget_Upload')->deleteHandle = array('WeiboFileNotMovie_Plugin', 'deleteHandle');
         Typecho_Plugin::factory('Widget_Upload')->attachmentHandle = array('WeiboFileNotMovie_Plugin', 'attachmentHandle');
+		if(!is_dir(dirname(__FILE__)."/uploadfile")){mkdir (dirname(__FILE__)."/uploadfile", 0777, true );}
         return _t('插件已经激活，需先配置微博图床的信息！');
     }
 
@@ -28,17 +29,13 @@ class WeiboFileNotMovie_Plugin implements Typecho_Plugin_Interface{
 
     // 插件配置面板
     public static function config(Typecho_Widget_Helper_Form $form){
-		//版本检查
-		$version=file_get_contents('https://www.tongleer.com/api/interface/WeiboFile.php?action=updateWeiboFileNotMovie&version=7');
-		$headDiv=new Typecho_Widget_Helper_Layout();
-		$headDiv->html('<small>版本检查：'.$version.'</small>');
-		$headDiv->render();
-		
-        $weibouser = new Typecho_Widget_Helper_Form_Element_Text('weibouser', null, '', _t('微博小号用户名：'), _t('备注：设置后可多尝试多上传几次，上传成功尽量不要将此微博小号登录微博系的网站、软件，可以登录，但不确定会不会上传失败，上传失败了再重新上传2次同样可以正常上传，如果小号等级过低，可尝试微博大号，插件可正常使用，无需担心。'));
+        
+		$weibouser = new Typecho_Widget_Helper_Form_Element_Text('weibouser', array("value"), '已不需配置', _t('微博小号用户名：'), _t('备注：设置后可多尝试多上传几次，上传成功尽量不要将此微博小号登录微博系的网站、软件，可以登录，但不确定会不会上传失败，上传失败了再重新上传2次同样可以正常上传，如果小号等级过低，可尝试微博大号，插件可正常使用，无需担心。'));
         $form->addInput($weibouser->addRule('required', _t('微博小号用户名不能为空！')));
 
-        $weibopass = new Typecho_Widget_Helper_Form_Element_Password('weibopass', null, '', _t('微博小号密码：'));
+        $weibopass = new Typecho_Widget_Helper_Form_Element_Password('weibopass', array("value"), '', _t('微博小号密码：'));
         $form->addInput($weibopass->addRule('required', _t('微博小号密码不能为空！')));
+		
     }
 	
     // 个人用户配置面板
@@ -75,6 +72,35 @@ class WeiboFileNotMovie_Plugin implements Typecho_Plugin_Interface{
         if (!isset($filename)) return false;
 		
 		if(in_array($ext,array('gif','jpg','jpeg','png','bmp'))){
+			$tempfilename = iconv("utf-8", "gbk", @$file['name']);
+			move_uploaded_file(@$file['tmp_name'], dirname(__FILE__).'/uploadfile/'.$tempfilename);
+			$ch = curl_init();
+			$filePath = dirname(__FILE__).'/uploadfile/'.$tempfilename;
+			$data = array('file' => '@' . $filePath);
+			if (class_exists('\CURLFile')) {
+				$data['file'] = new \CURLFile(realpath($filePath));
+			} else {
+				if (defined('CURLOPT_SAFE_UPLOAD')) {
+					curl_setopt($ch, CURLOPT_SAFE_UPLOAD, FALSE);
+				}
+			}
+			curl_setopt($ch, CURLOPT_URL, 'https://www.tongleer.com/api/web/?action=weiboimg&type=ali');
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			$json=curl_exec($ch);
+			curl_close($ch);
+			@unlink(dirname(__FILE__).'/uploadfile/'.$tempfilename);
+			$arr=json_decode($json,true);
+			return array(
+				'name'  =>  $file['name'],
+				'path'  =>  $arr['data']['src'],
+				'size'  =>  $file['size'],
+				'type'  =>  $ext,
+				'mime'  =>  "image/*"
+			);
+			//原始微博图床代码
+			/*
 			$Sinaupload=new Sinaupload('');
 			$cookie=$Sinaupload->login($option->weibouser,$option->weibopass);
 			$result=$Sinaupload->upload($filename);
@@ -86,6 +112,7 @@ class WeiboFileNotMovie_Plugin implements Typecho_Plugin_Interface{
 				'type'  =>  $ext,
 				'mime'  =>  Typecho_Common::mimeContentType($filename)
 			);
+			*/
 		}else{
 			$dirtime=date("Y")."/".date("m").'/';
 			$dir=__TYPECHO_ROOT_DIR__ . "/usr/uploads/".$dirtime."/";
@@ -128,7 +155,8 @@ class WeiboFileNotMovie_Plugin implements Typecho_Plugin_Interface{
 		$part = explode('.', $content['attachment']->name);
         $ext = (($length = count($part)) > 1) ? strtolower($part[$length-1]) : '';
 		if(in_array($ext,array('gif','jpg','jpeg','png','bmp'))){
-			return Typecho_Common::url($content['attachment']->path.'.jpg', 'https://ws3.sinaimg.cn/large/');
+			return $content['attachment']->path;
+			//return Typecho_Common::url($content['attachment']->path.'.jpg', 'https://wx3.sinaimg.cn/large/');
 		}else{
 			return Typecho_Common::url($content['attachment']->path, $plug_url.'/../..');
 		}
