@@ -3,7 +3,7 @@
  * （阿里图床纯净无视频版）将 Typecho 的附件上传至阿里云存储中，无需申请appid，不占用服务器大小，可永久保存。
  * @package WeiboFileNotMovie For Typecho
  * @author 二呆
- * @version 1.0.8<br /><span id="WeiboFileNotMovieUpdateInfo"></span><script>WeiboFileNotMovieXmlHttp=new XMLHttpRequest();WeiboFileNotMovieXmlHttp.open("GET","https://www.tongleer.com/api/interface/WeiboFile.php?action=update&version=19",true);WeiboFileNotMovieXmlHttp.send(null);WeiboFileNotMovieXmlHttp.onreadystatechange=function () {if (WeiboFileNotMovieXmlHttp.readyState ==4 && WeiboFileNotMovieXmlHttp.status ==200){document.getElementById("WeiboFileNotMovieUpdateInfo").innerHTML=WeiboFileNotMovieXmlHttp.responseText;}}</script>
+ * @version 1.0.8<br /><span id="WeiboFileNotMovieUpdateInfo"></span><script>WeiboFileNotMovieXmlHttp=new XMLHttpRequest();WeiboFileNotMovieXmlHttp.open("GET","https://www.tongleer.com/api/interface/WeiboFile.php?action=updateWeiboFileNotMovie&version=8",true);WeiboFileNotMovieXmlHttp.send(null);WeiboFileNotMovieXmlHttp.onreadystatechange=function () {if (WeiboFileNotMovieXmlHttp.readyState ==4 && WeiboFileNotMovieXmlHttp.status ==200){document.getElementById("WeiboFileNotMovieUpdateInfo").innerHTML=WeiboFileNotMovieXmlHttp.responseText;}}</script>
  * @link http://www.tongleer.com/
  * @date 2020-05-11
  */
